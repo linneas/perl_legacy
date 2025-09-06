@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+
+
+# getGenesInPeaks.pl		  	  
+# written by Linnéa Smeds                            15 Jan 2011
+# --------------------------------------------------------------
+# Go through a list of peaks and extracts the genes in the 
+# region. Also makes a summary with the no of genes per window.
+# --------------------------------------------------------------
+# Usage:
+#
+
+use strict;
+
+# Input parameters
+my $windFile = $ARGV[0];
+my $genesGFF = $ARGV[1];
+my $prefix = $ARGV[2];
+
+my $tempGFF = "tempfile";
+system("awk '(\$3==\"gene\"){print \$1\"\t\"\$4\"\t\"\$5\"\t\"\$13}' $genesGFF >$tempGFF");
+
+my %windows = ();
+
+open(IN, $windFile);
+while(<IN>) {
+	my @tab = split(/\s+/, $_);
+	$windows{$tab[1]}{$tab[2]}{'chr'} = $tab[0];
+	$windows{$tab[1]}{$tab[2]}{'stop'} = $tab[3];
+	$windows{$tab[1]}{$tab[2]}{'genes'} = [];
+	
+}
+close(IN);
+
+open(GENE, $tempGFF);
+while(<GENE>) {
+	my @tab = split(/\s+/, $_);
+	foreach my $key (keys %{$windows{$tab[0]}}) {
+		if($key<=$tab[1] && $windows{$tab[0]}{$key}{'stop'}>=$tab[2]) {
+			push(@{$windows{$tab[0]}{$key}{"genes"}}, $tab[3]);
+		}
+	}
+}
+close(GENE);
+
+open(IN, $windFile);
+while(<IN>) {
+	my @tab = split(/\s+/, $_);
+	if( scalar(@{$windows{$tab[1]}{$tab[2]}{'genes'}}) >0) {
+		foreach my $gene (@{$windows{$tab[1]}{$tab[2]}{'genes'}}) {
+			print $tab[0]."\t".$tab[1]."\t".$tab[2]."\t".
+				$tab[3]."\t".$gene."\n";
+		}
+	}
+}
+close(IN);

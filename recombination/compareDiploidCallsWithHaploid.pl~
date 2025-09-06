@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# compareDiploidCallsWithHaploid.pl
+# written by Linnéa Smeds                      15 Sept 2015
+# ---------------------------------------------------------
+# DESCRIPTION:
+# Takes a file with informative sites and (diploid) GT, and
+# a file with vcf file names and which columns (1-based)  
+# they correspond to. Then go through each of these columns 
+# and correct the GT with the haploid call. 
+
+# ---------------------------------------------------------
+# Example 
+
+use strict;
+use warnings;
+
+# Input parameters
+my $SITEFILE = $ARGV[0];
+my $VCFLIST = $ARGV[1];
+#my $COLUMNS = $ARGV[2];
+
+# The site file should not be very long so we can go through
+# it twice, first to check which positions to save and then
+# to check the GTs.
+
+my %pos = ();
+open(IN, $SITEFILE);
+while(<IN>) {
+ my @t=split(/\s+/, $_);
+ $pos{$t[0]}{$t[1]}=0;	#Just give it them some value to define the position!
+}
+close(IN);
+
+# Go through the list with vcf files and open each of them 
+open(LST, $VCFLIST);
+while(<LST>) {
+	my ($file, $col)=split(/\s+/, $_);
+	$col=$col-1;	#Change to 0-based pos
+	open(VCF, $file);
+	while(my $line=<VCF>) {
+		unless(/^#/) {
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# make array of columns
+my @col=split(/,/, $COLUMNS);
+
+#open(OUT, ">$OUT");		#Initiating outfile
+
+# GO THROUGH THE FILE
+open(IN, $FILE);
+while(<IN>) {
+	my @t=split(/\s+/,$_);
+
+	my $printflag="on";
+	my @cov=split(/:/, $t[4]);
+
+	foreach my $c (@col) {
+#		print "DEBUG: Checking $c: cov is".$cov[$c-1]."\n";
+		if($cov[$c-1] eq "." || $cov[$c-1]<$THRES){
+			
+			$printflag="off";
+			last;
+		}
+	}
+	
+	if($printflag eq "on") {
+		print $_;
+	}
+}
+close(IN);
+
